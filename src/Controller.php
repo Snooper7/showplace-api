@@ -10,12 +10,12 @@ class Controller
      * Разделяем входящие запросы на отдельные ресурсы и на коллекции ресурсов.
      * Для обработки каждого из них создаем отдельный метод.
      */
-    public function processRequest(string $method, string | null $id): void
+    public function processRequest(string $method, string $substance, string | null $id): void
     {
         if ($id) {
             $this->processResourceRequest($method, $id);
         } else {
-            $this->processCollectionRequest($method);
+            $this->processCollectionRequest($method, $substance);
         }
     }
     // Метод для отдельных ресурсов
@@ -65,11 +65,11 @@ class Controller
         }
     }
     // Метод для коллекций
-    private function processCollectionRequest ($method): void
+    private function processCollectionRequest ($method, $substance): void
     {
         switch ($method) {
             case "GET":
-                echo json_encode($this->gateway->getAll());
+                echo json_encode($this->gateway->getAll($substance));
                 break;
 
             case "POST":
@@ -86,7 +86,7 @@ class Controller
 
                 http_response_code(201);
                 echo json_encode([
-                   "message" => "Showlace created",
+                   "message" => "Showplace created",
                    "id" => $id
                 ]);
                 break;

@@ -8,9 +8,10 @@ class Gateway
         $this->conn = $database->getConnection();
     }
 
-    public function getAll(): array
+    public function getAll($substance): array
     {
-        $sql = "SELECT
+        if ($substance == "showplace") {
+            $sql = "SELECT
                     s.id AS id,
                     c.title AS city,
                     s.title AS title,
@@ -22,6 +23,19 @@ class Gateway
                     city AS c
                 ON
                     s.id_city = c.id";
+        } elseif ($substance == "city") {
+            $sql = "SELECT
+                    c.id AS id,
+                    c.title AS city
+                FROM
+                    city AS c";
+        } elseif ($substance == "traveler") {
+            $sql = "SELECT
+                    t.id AS id,
+                    t.name AS name
+                FROM
+                    traveler AS t";
+        }
 
         $stmt = $this->conn->query($sql);
 
@@ -62,9 +76,7 @@ class Gateway
 
         $stmt->execute();
 
-        $data = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        return $data;
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function update(array $current, array $new): int
@@ -75,8 +87,8 @@ class Gateway
 
         $stmt = $this->conn->prepare($sql);
 
-        $stmt->bindValue(":id_city", $new["id_city"] ?? $current["id_city"], PDO::PARAM_INT);
-        $stmt->bindValue(":title", $new["title"] ?? $current["title"], PDO::PARAM_STR);
+        $stmt->bindValue(":id_city", $new["id_city"] ?? $current["id_city"]);
+        $stmt->bindValue(":title", $new["title"] ?? $current["title"]);
         $stmt->bindValue(":distance", $new["distance"] ?? $current["distance"]);
         $stmt->bindValue(":avg_score", $new["avg_score"] ?? $current["avg_score"]);
 
