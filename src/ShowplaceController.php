@@ -2,7 +2,7 @@
 
 class ShowplaceController
 {
-    public function __construct(private ShowplaceGateway $gateway)
+    public function __construct(private Gateway $gateway)
     {
     }
 

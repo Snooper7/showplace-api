@@ -1,6 +1,6 @@
 <?php
 
-class ShowplaceGateway
+class Gateway
 {
     private PDO $conn;
     public function __construct(Database $database)
