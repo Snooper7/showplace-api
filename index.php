@@ -32,6 +32,6 @@ $database = new Database("localhost", "showplace", "root", "");
 $gateway = new Gateway($database);
 
 
-$controller = new ShowplaceController($gateway);
+$controller = new Controller($gateway);
 
 $controller->processRequest($_SERVER['REQUEST_METHOD'], $id);

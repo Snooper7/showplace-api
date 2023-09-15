@@ -1,6 +1,6 @@
 <?php
 
-class ShowplaceController
+class Controller
 {
     public function __construct(private Gateway $gateway)
     {
