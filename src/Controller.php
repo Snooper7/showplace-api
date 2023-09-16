@@ -29,6 +29,8 @@ class Controller
             return;
         }
 
+
+
         switch ($method) {
             case "GET":
                 echo json_encode($resource);
@@ -83,6 +85,10 @@ class Controller
                 }
 
                 $id = $this->gateway->create($data, $substance);
+
+                if ($substance == "score") {
+                    $this->gateway->avgScore($data);
+                }
 
                 http_response_code(201);
                 echo json_encode([

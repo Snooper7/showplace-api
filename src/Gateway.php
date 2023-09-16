@@ -1,5 +1,7 @@
 <?php
 
+use JetBrains\PhpStorm\NoReturn;
+
 class Gateway
 {
     private PDO $conn;
@@ -143,5 +145,26 @@ class Gateway
         $stmt->execute();
 
         return $stmt->rowCount();
+    }
+
+    #[NoReturn] public function avgScore(array $data): void
+    {
+        $sql = "SELECT score FROM score
+                WHERE id_showplace = :id";
+
+        $stmt = $this->conn->prepare($sql);
+
+        $stmt->bindValue(":id", $data["id_showplace"], PDO::PARAM_INT);
+
+        $stmt->execute();
+
+        $array = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+        $avg_score =round(array_sum($array) / count($array), 2, PHP_ROUND_HALF_UP);
+        $avg_score_arr = array("avg_score" => $avg_score);
+
+        $current = $this->get("showplace", $data["id_showplace"]);
+
+        $this->update($current, $avg_score_arr, "showplace");
     }
 }
