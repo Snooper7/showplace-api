@@ -13,25 +13,25 @@ class Controller
     public function processRequest(string $method, string $substance, string | null $id): void
     {
         if ($id) {
-            $this->processResourceRequest($method, $id);
+            $this->processResourceRequest($method, $substance, $id);
         } else {
             $this->processCollectionRequest($method, $substance);
         }
     }
     // Метод для отдельных ресурсов
-    private function processResourceRequest (string $method, string $id): void
+    private function processResourceRequest (string $method, string $substance, string $id): void
     {
-        $showplace = $this->gateway->get($id);
+        $resource = $this->gateway->get($substance, $id);
 
-        if (! $showplace) {
+        if (!$resource) {
             http_response_code(404);
-            echo json_encode(["message" => "Showplace not found"]);
+            echo json_encode(["message" => "$substance not found"]);
             return;
         }
 
         switch ($method) {
             case "GET":
-                echo json_encode($showplace);
+                echo json_encode($resource);
                 break;
             case "PATCH":
                 $data =(array) json_decode(file_get_contents("php://input"), true);
@@ -43,18 +43,18 @@ class Controller
                     break;
                 }
 
-                $rows = $this->gateway->update($showplace, $data);
+                $rows = $this->gateway->update($resource, $data);
 
                 echo json_encode([
-                    "message" => "Showplace $id updated",
+                    "message" => "$substance $id updated",
                     "rows" => $rows
                 ]);
                 break;
             case "DELETE":
-                $rows = $this->gateway->delete($id);
+                $rows = $this->gateway->delete($substance, $id);
 
                 echo json_encode([
-                    "message" => "Showplace $id deleted",
+                    "message" => "$substance $id deleted",
                     "rows" => $rows
                 ]);
                 break;
@@ -75,18 +75,18 @@ class Controller
             case "POST":
                 $data =(array) json_decode(file_get_contents("php://input"), true);
 
-                $errors = $this->getValidationErrors($data);
+//                $errors = $this->getValidationErrors($data);
 
                 if (!empty($errors)) {
                     echo json_encode($errors);
                     break;
                 }
 
-                $id = $this->gateway->create($data);
+                $id = $this->gateway->create($data, $substance);
 
                 http_response_code(201);
                 echo json_encode([
-                   "message" => "Showplace created",
+                   "message" => "$substance created",
                    "id" => $id
                 ]);
                 break;

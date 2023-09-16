@@ -1,5 +1,13 @@
 {
-    "id_city": 9,
-    "title": "Times Square",
-    "distance": 1.3
+    "showplace": {
+        "id_city": 9,
+        "title": "Times Square",
+        "distance": 1.3
+    },
+    "city": {
+        "title": "Tokio"
+    },
+    "traveler": {
+        "name": "Rich"
+    }
 }

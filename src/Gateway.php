@@ -24,17 +24,9 @@ class Gateway
                 ON
                     s.id_city = c.id";
         } elseif ($substance == "city") {
-            $sql = "SELECT
-                    c.id AS id,
-                    c.title AS city
-                FROM
-                    city AS c";
+            $sql = "SELECT * FROM city";
         } elseif ($substance == "traveler") {
-            $sql = "SELECT
-                    t.id AS id,
-                    t.name AS name
-                FROM
-                    traveler AS t";
+            $sql = "SELECT * FROM traveler";
         }
 
         $stmt = $this->conn->query($sql);
@@ -48,26 +40,40 @@ class Gateway
         return $data;
     }
 
-    public function create(array $data): string
+    public function create(array $data, string $substance): string
     {
-        $sql = "INSERT INTO showplace (id_city, title, distance)
+        if ($substance == "showplace") {
+            $sql = "INSERT INTO showplace (id_city, title, distance)
                 VALUES (:id_city, :title, :distance)";
+        } elseif ($substance == "city") {
+            $sql = "INSERT INTO city (title)
+                VALUES (:title)";
+        } elseif ($substance == "traveler") {
+            $sql = "INSERT INTO traveler (name)
+                VALUES (:name)";
+        }
 
         $stmt = $this->conn->prepare($sql);
 
-        $stmt->bindValue(":id_city", $data["id_city"], PDO::PARAM_INT);
-        $stmt->bindValue(":title", $data["title"], PDO::PARAM_STR);
-        $stmt->bindValue(":distance", $data["distance"]);
+        if ($substance == "showplace") {
+            $stmt->bindValue(":id_city", $data["id_city"], PDO::PARAM_INT);
+            $stmt->bindValue(":title", $data["title"], PDO::PARAM_STR);
+            $stmt->bindValue(":distance", $data["distance"]);
+        } elseif ($substance == "city") {
+            $stmt->bindValue(":title", $data["title"], PDO::PARAM_STR);
+        } elseif ($substance == "traveler") {
+            $stmt->bindValue(":name", $data["name"], PDO::PARAM_STR);
+        }
 
         $stmt->execute();
 
         return $this->conn->lastInsertId();
     }
 
-    public function get(string $id): array | false
+    public function get(string $substance, string $id): array | false
     {
         $sql = "SELECT *
-                FROM showplace 
+                FROM $substance 
                 WHERE id = :id";
 
         $stmt = $this->conn->prepare($sql);
@@ -99,9 +105,9 @@ class Gateway
         return $stmt->rowCount();
     }
 
-    public function delete(string $id): int
+    public function delete(string $substance, string $id): int
     {
-        $sql = "DELETE FROM showplace
+        $sql = "DELETE FROM $substance
                 WHERE id = :id";
 
         $stmt = $this->conn->prepare($sql);
