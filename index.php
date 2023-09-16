@@ -31,7 +31,7 @@ $id = $path[2] ?? null;
 $database = new Database("localhost", "showplace", "root", "");
 
 // Подключаемся к базе через Gateway
-$gateway = new Gateway($database, $substance);
+$gateway = new Gateway($database);
 
 // Запускаем контроллер
 $controller = new Controller($gateway);

@@ -9,5 +9,10 @@
     },
     "traveler": {
         "name": "Rich"
+    },
+    "score": {
+        "id_showplace": 3,
+        "id_traveler": 2,
+        "score": 3
     }
 }

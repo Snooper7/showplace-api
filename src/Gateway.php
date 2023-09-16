@@ -51,7 +51,11 @@ class Gateway
         } elseif ($substance == "traveler") {
             $sql = "INSERT INTO traveler (name)
                 VALUES (:name)";
+        } elseif ($substance == "score") {
+            $sql = "INSERT INTO score (id_showplace, id_traveler, score)
+                VALUES (:id_showplace, :id_traveler, :score)";
         }
+
 
         $stmt = $this->conn->prepare($sql);
 
@@ -63,6 +67,10 @@ class Gateway
             $stmt->bindValue(":title", $data["title"], PDO::PARAM_STR);
         } elseif ($substance == "traveler") {
             $stmt->bindValue(":name", $data["name"], PDO::PARAM_STR);
+        } elseif ($substance == "score") {
+            $stmt->bindValue(":id_showplace", $data["id_showplace"], PDO::PARAM_INT);
+            $stmt->bindValue(":id_traveler", $data["id_traveler"], PDO::PARAM_INT);
+            $stmt->bindValue(":score", $data["score"], PDO::PARAM_INT);
         }
 
         $stmt->execute();
@@ -85,20 +93,38 @@ class Gateway
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function update(array $current, array $new): int
+    public function update(array $current, array $new, string $substance): int
     {
-        $sql = "UPDATE showplace
+        if ($substance == "showplace") {
+            $sql = "UPDATE showplace
                 SET id_city = :id_city, title = :title, distance = :distance, avg_score = :avg_score
                 WHERE id = :id";
+        } elseif ($substance == "city") {
+            $sql = "UPDATE city
+                SET title = :title
+                WHERE id = :id";
+        } elseif ($substance == "traveler") {
+            $sql = "UPDATE traveler
+                SET name = :name
+                WHERE id = :id";
+        }
 
         $stmt = $this->conn->prepare($sql);
 
-        $stmt->bindValue(":id_city", $new["id_city"] ?? $current["id_city"]);
-        $stmt->bindValue(":title", $new["title"] ?? $current["title"]);
-        $stmt->bindValue(":distance", $new["distance"] ?? $current["distance"]);
-        $stmt->bindValue(":avg_score", $new["avg_score"] ?? $current["avg_score"]);
+        if ($substance == "showplace") {
+            $stmt->bindValue(":id_city", $new["id_city"] ?? $current["id_city"]);
+            $stmt->bindValue(":title", $new["title"] ?? $current["title"]);
+            $stmt->bindValue(":distance", $new["distance"] ?? $current["distance"]);
+            $stmt->bindValue(":avg_score", $new["avg_score"] ?? $current["avg_score"]);
 
-        $stmt->bindValue(":id", $current["id"], PDO::PARAM_INT);
+            $stmt->bindValue(":id", $current["id"], PDO::PARAM_INT);
+        } elseif ($substance == "city") {
+            $stmt->bindValue(":title", $new["title"] ?? $current["title"]);
+            $stmt->bindValue(":id", $current["id"], PDO::PARAM_INT);
+        } elseif ($substance == "traveler") {
+            $stmt->bindValue(":name", $new["name"] ?? $current["name"]);
+            $stmt->bindValue(":id", $current["id"], PDO::PARAM_INT);
+        }
 
         $stmt->execute();
 

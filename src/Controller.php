@@ -43,7 +43,7 @@ class Controller
                     break;
                 }
 
-                $rows = $this->gateway->update($resource, $data);
+                $rows = $this->gateway->update($resource, $data, $substance);
 
                 echo json_encode([
                     "message" => "$substance $id updated",
