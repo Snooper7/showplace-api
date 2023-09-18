@@ -6,18 +6,39 @@ class Controller
     {
     }
 
+//    public function processFind($data)
+//    {
+//
+//    }
+
     /*
      * Разделяем входящие запросы на отдельные ресурсы и на коллекции ресурсов.
      * Для обработки каждого из них создаем отдельный метод.
      */
-    public function processRequest(string $method, string $substance, string | null $id): void
+    public function processRequest(string $method, string $substance, string | null $id, $get): void
     {
+        if ($get) {
+            $this->processExtractResource($substance, $get);
+        }
         if ($id) {
             $this->processResourceRequest($method, $substance, $id);
         } else {
             $this->processCollectionRequest($method, $substance);
         }
     }
+
+    // Метод для поиска и сортировки
+
+    private function processExtractResource(string $substance, array $get): void
+    {
+        if (array_key_exists("sortByScore", $get)) {
+            echo json_encode($this->gateway->sortByScore($substance, $get));
+            exit();
+        }
+        echo json_encode($this->gateway->selectBy($substance, $get));
+        exit();
+    }
+
     // Метод для отдельных ресурсов
     private function processResourceRequest (string $method, string $substance, string $id): void
     {

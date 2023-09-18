@@ -167,4 +167,116 @@ class Gateway
 
         $this->update($current, $avg_score_arr, "showplace");
     }
+
+    public function selectBy($substance, $get)
+    {
+        if ($substance == "showplace") {
+            $sql = "SELECT
+                    s.id AS id,
+                    s.title AS title,
+                    s.distance AS 'distance from center',
+                    s.avg_score AS 'average score'
+                FROM
+                    showplace AS s
+                LEFT JOIN
+                    city AS c
+                ON
+                    s.id_city = c.id
+                WHERE c.id = :id";
+
+            $stmt = $this->conn->prepare($sql);
+
+            $stmt->bindValue(":id", $get["id_city"], PDO::PARAM_INT);
+
+            $stmt->execute();
+
+            $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        } elseif ($substance == "traveler") {
+            $sql = "SELECT city.title AS city 
+                    FROM score 
+                    LEFT JOIN traveler 
+                    ON score.id_traveler = traveler.id 
+                    LEFT JOIN showplace 
+                    ON score.id_showplace = showplace.id 
+                    LEFT JOIN city 
+                    ON showplace.id_city = city.id 
+                    WHERE traveler.id = :id";
+
+            $stmt = $this->conn->prepare($sql);
+
+            $stmt->bindValue(":id", $get["id_traveler"], PDO::PARAM_INT);
+
+            $stmt->execute();
+
+            $data = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+        } elseif ($substance == "city") {
+            $sql = "SELECT traveler.name AS name 
+                    FROM score 
+                    LEFT JOIN traveler 
+                    ON score.id_traveler = traveler.id 
+                    LEFT JOIN showplace 
+                    ON score.id_showplace = showplace.id 
+                    LEFT JOIN city 
+                    ON showplace.id_city = city.id 
+                    WHERE city.id = :id";
+
+            $stmt = $this->conn->prepare($sql);
+
+            $stmt->bindValue(":id", $get["id_city"], PDO::PARAM_INT);
+
+            $stmt->execute();
+
+            $data = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        }
+
+        return $data;
+    }
+
+    public function sortByScore($substance, $get)
+    {
+        if ($substance == "showplace") {
+            if ($get["sortByScore"] == "DESC") {
+                $sql = "SELECT
+                    s.id AS id,
+                    s.title AS title,
+                    s.distance AS 'distance from center',
+                    s.avg_score AS 'average score'
+                FROM
+                    showplace AS s
+                LEFT JOIN
+                    city AS c
+                ON
+                    s.id_city = c.id
+                ORDER BY `average score` DESC ";
+
+                $stmt = $this->conn->query($sql);
+
+                $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            } elseif ($get["sortByScore"] == "ASC") {
+                $sql = "SELECT
+                    s.id AS id,
+                    s.title AS title,
+                    s.distance AS 'distance from center',
+                    s.avg_score AS 'average score'
+                FROM
+                    showplace AS s
+                LEFT JOIN
+                    city AS c
+                ON
+                    s.id_city = c.id
+                ORDER BY `average score` ASC ";
+
+                $stmt = $this->conn->query($sql);
+
+                $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            }
+        } elseif ($substance == "traveler") {
+
+        } elseif ($substance == "city") {
+        }
+
+        return $data;
+    }
 }

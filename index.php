@@ -12,8 +12,19 @@ set_exception_handler("ErrorHandler::handleException");
 // Прописываем принудительно тип контента
 header("Content-type: application/json; charset=UTF-8");
 
+// Проверяем наличие GET параметров и записываем их в переменную
+$get = [];
+
+if ($_GET) {
+    $get = $_GET;
+}
+
+// Отсекаем GET параметры
+$path_w_get = explode('?', $_SERVER['REQUEST_URI']);
+$path_wo_get = $path_w_get[0];
+
 // Разбиваем запрос на части
-$path = explode('/', $_SERVER['REQUEST_URI']);
+$path = explode('/', $path_wo_get);
 
 $substance = $path[1];
 $substances = ['showplace', 'city', 'traveler', 'score'];
@@ -36,4 +47,4 @@ $gateway = new Gateway($database);
 // Запускаем контроллер
 $controller = new Controller($gateway);
 
-$controller->processRequest($_SERVER['REQUEST_METHOD'], $substance, $id);
+$controller->processRequest($_SERVER['REQUEST_METHOD'], $substance, $id, $get);
